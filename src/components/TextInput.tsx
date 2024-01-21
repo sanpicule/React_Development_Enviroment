@@ -8,7 +8,7 @@ const TextInput = () => {
         type="text"
         value={text}
         onChange={(e) => setText(e.target.value)}
-        aria-label='Input Element'
+        aria-label="Input Element"
       />
       <p>Entered Text: {text}</p>
     </div>

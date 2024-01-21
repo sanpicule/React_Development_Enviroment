@@ -23,10 +23,10 @@
     /* import alias */
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
     },
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals"],
   },
   "include": ["src", "vitest-setup.ts"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "references": [{ "path": "./tsconfig.node.json" }],
 }
