@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "test": "vitest watch",
     "coverage": "vitest run --coverage",
-    "format": "prettier . --write"
+    "format": "prettier . --write",
+    "prepare": "husky install"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -32,10 +33,18 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "happy-dom": "^13.2.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
     "prettier": "^3.2.4",
     "typescript": "^5.2.2",
     "vite": "^5.0.8",
     "vite-tsconfig-paths": "^4.3.1",
     "vitest": "^1.2.1"
+  },
+  "lint-staged": {
+    "*.{js, jsx, ts, tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }
