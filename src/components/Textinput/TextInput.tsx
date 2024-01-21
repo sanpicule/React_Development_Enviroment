@@ -11,6 +11,7 @@ const TextInput = () => {
         aria-label="Input Element"
       />
       <p>Entered Text: {text}</p>
+      <p>Entered Text: {text}</p>
     </div>
   )
 }
