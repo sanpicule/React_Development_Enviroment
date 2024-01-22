@@ -1,389 +1,221 @@
-1. node -v(volta list)
-2. npm create vite@latest smaple-app -- --template react-swc-ts
-3. npm run dev, build, preview
-4. tsconfig.json(path alias)
+# React 開発環境テンプレート
 
+## 概要
+
+このリポジトリは、Viteを使用した2024年1月時点でのReact開発環境のテンプレートです。
+以下のツールや設定が含まれています
+
+#### 開発言語
+
+- TypeScript
+
+#### CSSフレームワーク
+
+- TailwindCSS
+
+#### UIコンポーネント
+- shadcn
+
+#### LintingとFormat
+- Prettier
+- ESLint
+- Husky
+- lint-staged
+
+#### テストツール
+- Vitest
+
+#### CI/CD
+- GitHub Actions
+
+#### その他
+- Storybook
+
+# インストール
+プロジェクトをクローンした後、以下のコマンドを実行して依存関係をインストールしてください。
+
+```bash
+  npm install
+```
+
+# 使い方と説明
+
+## 開発サーバーの起動
+
+```bash
+  npm run dev
+```
+
+開発用のサーバーが http://localhost:5174 で起動します。
+
+## ビルド
+
+```bash
+  npm run build
+```
+
+プロダクション向けにアプリケーションをビルドします。
+デフォルトでは、ビルド結果は dist に置かれます。この dist フォルダーを、お好みのプラットフォームにデプロイします。
+
+## アプリをローカルで確認する
+
+```bash
+  npm run build
+  npm run preview
+```
+
+vite preview コマンドは、ローカルで静的なウェブサーバーを起動し、dist のファイルを http://localhost:4173 で確認できます。これは、プロダクションビルドが問題ないかどうかを自分のローカル環境で確認する簡単な方法です。
+
+## 構文チェックとフォーマット
+今回のプロジェクトでは、git commitが実行された際に、husky が pre-commit フックをトリガーし、lint-staged が対象のファイルに対して静的解析(ESLint)とフォーマット(Prettier)を自動的に行います。
+また、今回のlint-stagedの設定はこちらになります。お好みに合わせて変更してお使いください。
 ```json
-"compilerOptions": {
-    "baseUrl": "./",
-    "paths": {
-      "@/*": ["src/*"]
-    }
+"lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "npm run format",
+      "npm run lint:fix"
+    ]
   },
 ```
 
-5. npm i -D vite-tsconfig-paths (これで vite.config.ts は編集する必要なし)
-6. vite.config.ts
+※下記は、ESLintとPrettierを別々に実行するためのコマンドです。
 
-```ts
-import react from "@vitejs/plugin-react-swc";
-import { defineConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
+## ESLint
 
-export default defineConfig({
-  plugins: [react(), tsconfigPaths()], //for path alias
-});
+```bash
+npm run lint
 ```
 
-7. npm install -D \
-   vitest \
-   happy-dom \
-   @vitest/coverage-v8 \
-   @testing-library/react \
-   @testing-library/user-event \
-   @testing-library/jest-dom
+ESLintを使用してコードをリントします。自動的にエラーを解消したい場合は下記コマンドを入力してください
 
-8. "coverage": "vitest run --coverage"
+```bash
+npm run lint:fix
+```
 
-9. vite.config.ts
-
-```ts
-/// <reference types="vitest" />
-import react from "@vitejs/plugin-react-swc";
-import { defineConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
-
-export default defineConfig({
-  plugins: [react(), tsconfigPaths()],
-  test: {
-    // globals: true,
-    environment: "happy-dom",
-    setupFiles: ["./vitest-setup.ts"],
+#### ESLintの設定
+こちらは、個人で設定項目を追加してください。
+参考↓
+https://zenn.dev/noshiro_piko/articles/take-full-advantage-of-typescript-eslint
+```cjs
+  rules: {
+    'react/react-in-jsx-scope': 'off',
   },
-});
 ```
 
-10. vitest-setup.ts(import "@testing-library/jest-dom/vitest")
+## Prettier
+```bash
+  npm run format
+```
 
-11. tsconfig.json
+Prettierのルールに従って、コードをフォーマットします。
 
-```json
-{
-  "include": ["src", "vitest-setup.ts"]
+#### Pettierの設定
+こちらは、個人で設定項目を追加してください
+```js
+/** @type {import("prettier").config} */
+const config = {
+  singleQuote: true,
+  semi: false,
 }
+
+export default config
 ```
 
-12. src/components/Count.tsx
+## TailwindCSS
+https://tailwindcss.com/
 
+## Shadcn
+https://ui.shadcn.com/docs/components/card
+
+まずは、インストールしたいコンポーネントを持ってきます。
+```bash
+npx shadcn-ui@latest add calendar
+```
+**使い方**
 ```tsx
-// TextInput.js
-import { useState } from "react";
+  import { Calendar } from "@/components/ui/calendar"
+
+  const [date, setDate] = React.useState<Date | undefined>(new Date())
+  
+  return (
+    <Calendar
+      mode="single"
+      selected={date}
+      onSelect={setDate}
+      className="rounded-md border"
+    />
+  )
+```
+
+## テスト
+
+```bash
+npm test
+```
+
+Vitestを使用してテストを実行します。
+
+##### このリポジトリで実行している例
+
+まず、*TextInput.tsx*というファイルを作成
+
+```js
+import React, { useState } from 'react'
 
 const TextInput = () => {
-  const [text, setText] = useState("");
-
+  const [text, setText] = useState('')
   return (
     <div>
       <input
         type="text"
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="Enter some text"
-        aria-label="Text Input"
+        aria-label="Input Element"
       />
       <p>Entered Text: {text}</p>
+      <p>Entered Text: {text}</p>
     </div>
-  );
-};
+  )
+}
 
-export default TextInput;
+export default TextInput
 ```
 
-13. Count.test.tsx (and run coverage, test)
+テスト実行用のファイル（_TextInput.test.tsx_）
 
 ```tsx
-// TextInput.test.js
-import userEvent from "@testing-library/user-event";
-import { render, screen } from "@testing-library/react";
-import TextInput from "./TextInput";
+import userEvent from '@testing-library/user-event'
+import TextInput from './TextInput'
+import { render, screen } from '@testing-library/react'
 
-test("TextInput Component Test", async () => {
-  const user = userEvent.setup();
-  render(<TextInput />);
+test('TextInput Component Text', async () => {
+  const user = userEvent.setup()
+  render(<TextInput />)
 
-  const inputElement = screen.getByLabelText("Text Input");
-  expect(screen.getByText("Entered Text:")).toBeInTheDocument();
+  const textElement = screen.getByText('Entered Text:')
+  expect(textElement).toBeInTheDocument()
 
-  await user.type(inputElement, "Hello World");
-  expect(screen.getByText("Entered Text: Hello World")).toBeInTheDocument();
-});
+  const inputElement = screen.getByLabelText('Input Element')
+  await user.type(inputElement, 'Hello World')
+  expect(screen.getByText('Entered Text: Hello World')).toBeInTheDocument()
+})
 ```
 
-14. npm install -D eslint, npx eslint --init
+# 構成
 
-15. "lint": "eslint src" (added package.json), and npm run lint
+TailwindCSS: ユーティリティファーストのCSSフレームワークで、カスタマイズ可能なスタイリングが可能です。
 
-16. .eslintrc.cjs
+Prettier: コードの自動フォーマッターで、一貫性のあるコードスタイルを維持します。
 
-```cjs
-module.exports = {
-  env: {
-    browser: true,
-    es2021: true,
-  },
-  extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:react/recommended",
-  ],
-  overrides: [
-    {
-      env: {
-        node: true,
-      },
-      files: [".eslintrc.{js,cjs}"],
-      parserOptions: {
-        sourceType: "script",
-      },
-    },
-  ],
-  parser: "@typescript-eslint/parser",
-  parserOptions: {
-    ecmaVersion: "latest",
-    sourceType: "module",
-  },
-  plugins: ["@typescript-eslint", "react"],
-  rules: {
-    "react/react-in-jsx-scope": "off",
-  },
-};
-```
+ESLint: コードの静的解析ツールで、潜在的なバグやスタイルの問題を検出します。
 
-17. mod a App.tsx a tag rel="noreferrer"
+Vitest: Viteの組み込みテストランナーで、シンプルな構成でテストを実行できます。
 
-18. add some eslint roles (optional)
+TypeScript: JavaScriptに静的型チェックを導入し、より安全でメンテナブルなコードを書くことができます。
 
-19. npm i -D prettier
+Husky: Gitフックを使用してコミット前にlint-stagedを実行します。
 
-```js
-/** @type {import("prettier").Config} */
-const config = {};
+lint-staged: コミット前に実行するものを設定する。今回はPrettierとESLintを設定。
 
-export default config;
-```
+Storybook: コンポーネントのドキュメンテーションとUIテストを作成できるツールです。
 
-20. "lint": "eslint src"
-
-21. "prettier plugin and settings.json format on save"
-
-22. husky + lint-stataged
-
-```cmd
-git init
-npm install --save-dev husky lint-staged
-npx husky install
-npm pkg set scripts.prepare="husky install"
-npx husky add .husky/pre-commit "npx lint-staged"
-```
-
-23. pakage.json change and git add . git commit -m "init"
-
-```json
-{
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx,md}": ["prettier --write", "eslint --fix"]
-  },
-  "ignorePatterns": ["!.storybook"]
-}
-```
-
-24. npx storybook init --builder @storybook/builder-vite
-
-25. create storyBook directory and file (TextInput/TextInput.stories.tsx)
-
-26. npm install -D tailwindcss postcss autoprefixer
-    npx tailwindcss init -p
-
-27. tailwind.config.js
-
-```js
-/** @type {import('tailwindcss').Config} */
-export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-};
-```
-
-28. index.css
-
-```css
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-```
-
-29. check className utility
-
-30. npx shadcn-ui@latest init
-
-31. Would you like to use TypeScript (recommended)? no / yes
-    Which style would you like to use? › Default
-    Which color would you like to use as base color? › Slate
-    Where is your global CSS file? › › src/index.css
-    Do you want to use CSS variables for colors? › no / yes
-    Where is your tailwind.config.js located? › tailwind.config.js
-    Configure the import alias for components: › @/components
-    Configure the import alias for utils: › @/lib/utils
-    Are you using React Server Components? › no / yes (no)
-
-32. mod tailwind.config.js
-
-```js
-/** @type {import('tailwindcss').Config} */
-export default {
-  darkMode: ["class"],
-  content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
-  ],
-  prefix: "",
-  theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
-    extend: {
-      colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-      },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-      },
-      keyframes: {
-        "accordion-down": {
-          from: { height: "0" },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0" },
-        },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-      },
-    },
-  },
-  plugins: [import("tailwindcss-animate")],
-};
-```
-
-33. npx shadcn-ui@latest add button
-
-34. github actions setup
-
-35. .github/workflows/lint.yml & test.yml
-
-```lint.yml
-name: Lint
-
-on: push
-
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - run: npm ci
-      - run: npm run lint
-```
-
-```test.yml
-name: Test
-
-on: push
-
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - run: npm ci
-      - run: npm run test
-```
-
-or lint_test.yml
-
-```yml
-name: Lint and Test
-
-on: push
-
-jobs:
-  lint-and-test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Run Lint
-        run: npm run lint
-
-      - name: Run Test
-        run: npm run test
-```
-
-36. CD(Vite 静的ホスティング参照)
-
-#### Reference
-
-https://zenn.dev/tentel/articles/488dd8765fb059
-https://zenn.dev/kazukix/articles/react-setup-2024
